@@ -1,5 +1,5 @@
 [package]
-name = "rep"
+name = "rep_derive"
 version = "0.1.0"
 authors = ["Caleb Winston <calebhwin@gmail.com>"]
 description = "A small tool for representation/class invariants"
@@ -7,12 +7,16 @@ homepage = "https://www.github.com/calebwin/rep"
 documentation = "https://docs.rs/rep"
 repository = "https://www.github.com/calebwin/rep"
 keywords = ["rep", "rep_derive", "representation", "class", "invariants"]
-readme = "README.md"
 categories = ["data-structures", "development-tools::procedural-macro-helpers", "database", "database-implementations", "template-engine"]
 license = "MIT"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+proc-macro = true
+
 [dependencies]
-rep-derive = { path = "../rep_derive" }
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "1.0.5", features = ["full"] }

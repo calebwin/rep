@@ -1,5 +1,5 @@
 [package]
-name = "rep-example"
+name = "rep_example"
 version = "0.1.0"
 authors = ["Caleb Winston <calebhwin@gmail.com>"]
 edition = "2018"
