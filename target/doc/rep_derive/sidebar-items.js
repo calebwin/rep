@@ -1,1 +1,0 @@
-initSidebarItems({"attr":[["check_rep","A macro that auto-inserts calls to `check_rep`"]],"derive":[["CheckRep","A macro for deriving an implementation of `check_rep`"]]});
