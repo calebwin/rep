@@ -1,2 +1,2 @@
 [workspace]
-members = ["rep", "rep-derive", "rep-example"]
+members = ["rep", "rep_derive", "rep_example"]
