@@ -1,4 +1,7 @@
 # `rep`
+[![](http://meritbadge.herokuapp.com/rep)](https://crates.io/crates/rep)
+[![](https://docs.rs/rep/badge.svg)](https://docs.rs/rep)
+
 Rep is a small tool for checking representation/class invariants. As programmers, we should care about correctness at compile time and at run time. We should care about our data structures being correct. Rep is a small tool that lets you do 2 things.
 1. Define a correct representation (a rep/class invariant)
 2. Insert runtime checks (rep checks)
