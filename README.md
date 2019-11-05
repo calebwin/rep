@@ -19,7 +19,7 @@ pub struct Line {
 The `CheckRep` trait can be implemented. This serves as a definition of correct representation.
 ```rust
 impl CheckRep for Line {
-    fn check_rep(&self) -> bool {
+    fn is_correct(&self) -> bool {
         self.x1 != self.x2 && self.y1 != self.y2
     }
 }
@@ -36,7 +36,7 @@ impl Line {
             y1: 1
         };
         
-        assert!(new_line.check_rep());
+        new_line.check_rep();
         new_line
     }
     
@@ -73,7 +73,7 @@ struct Parser {
 Just add the following to your `Cargo.toml` file.
 ```toml
 [dependencies]
-rep = "0.1.0"
+rep = "0.2.0"
 ```
 
 Then you can begin defining representations and improving the safety of your software.

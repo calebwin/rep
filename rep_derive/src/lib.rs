@@ -28,6 +28,7 @@ pub fn derive_check_rep(input: proc_macro::TokenStream) -> proc_macro::TokenStre
     let data = input.data;
 
     let mut checks = vec![];
+    let mut asserts = vec![];
     let mut errors = vec![];
 
     if let Data::Struct(data_struct) = data {
@@ -56,6 +57,7 @@ pub fn derive_check_rep(input: proc_macro::TokenStream) -> proc_macro::TokenStre
                                 // 2. paths like #[rep(always_true)]
                                 if let NestedMeta::Meta(nested_meta) = nested {
                                     let field_name = field.ident.clone().unwrap();//_or(Ident::new(&i.to_string(), Span::call_site()));
+                                    let field_name_name = field.ident.clone().unwrap().to_string();
                                     let field_type = field.ty.clone();
                                     match nested_meta {
                                         Meta::Path(p) => {
@@ -66,18 +68,28 @@ pub fn derive_check_rep(input: proc_macro::TokenStream) -> proc_macro::TokenStre
                                                         self.#field_name == default
                                                     }
                                                 });
+                                                asserts.push(quote! {
+                                                    let default: #field_type = Default::default();
+                                                    assert_eq!(self.#field_name, default, "failed invariant that self.{} must be default, not {}", #field_name_name, self.#field_name);
+                                                })
                                             } else if p.is_ident("assert_true") {
                                                 checks.push(quote! {
                                                     && {
                                                         self.#field_name
                                                     }
                                                 });
+                                                asserts.push(quote! {
+                                                    assert_eq!(self.#field_name, true, "failed invariant that self.{} must be true", #field_name_name);
+                                                })
                                             } else if p.is_ident("assert_false") {
                                                 checks.push(quote! {
                                                     && {
                                                         !self.#field_name
                                                     }
                                                 });
+                                                asserts.push(quote! {
+                                                    assert_eq!(self.#field_name, false, "failed invariant that self.{} must be false", #field_name_name);
+                                                })
                                             } else {
                                                 errors.push(Error::new(p.span(), "unsupported representation invariant").to_compile_error());
                                             }
@@ -90,6 +102,9 @@ pub fn derive_check_rep(input: proc_macro::TokenStream) -> proc_macro::TokenStre
                                                         self.#field_name == #val
                                                     }
                                                 });
+                                                asserts.push(quote! {
+                                                    assert_eq!(self.#field_name, #val, "failed invariant that self.{} must be {}, not {}", #field_name_name, #val, self.#field_name);
+                                                })
                                             } else if v.path.is_ident("assert_ne") {
                                                 let val = v.lit.clone();
                                                 checks.push(quote! {
@@ -97,6 +112,9 @@ pub fn derive_check_rep(input: proc_macro::TokenStream) -> proc_macro::TokenStre
                                                         self.#field_name != #val
                                                     }
                                                 });
+                                                asserts.push(quote! {
+                                                    assert_ne!(self.#field_name, #val, "failed invariant that self.{} must not be {}", #field_name_name, #val);
+                                                })
                                             } else if v.path.is_ident("assert_gt") {
                                                 let val = v.lit.clone();
                                                 checks.push(quote! {
@@ -104,6 +122,9 @@ pub fn derive_check_rep(input: proc_macro::TokenStream) -> proc_macro::TokenStre
                                                         self.#field_name > #val
                                                     }
                                                 });
+                                                asserts.push(quote! {
+                                                    assert!(self.#field_name > #val, "failed invariant that self.{} must be > {}, not {}", #field_name_name, #val, self.#field_name);
+                                                })
                                             } else if v.path.is_ident("assert_lt") {
                                                 let val = v.lit.clone();
                                                 checks.push(quote! {
@@ -111,6 +132,9 @@ pub fn derive_check_rep(input: proc_macro::TokenStream) -> proc_macro::TokenStre
                                                         self.#field_name < #val
                                                     }
                                                 });
+                                                asserts.push(quote! {
+                                                    assert!(self.#field_name < #val, "failed invariant that self.{} must be < {}, not {}", #field_name_name, #val, self.#field_name);
+                                                })
                                             } else if v.path.is_ident("assert_ge") {
                                                 let val = v.lit.clone();
                                                 checks.push(quote! {
@@ -118,6 +142,9 @@ pub fn derive_check_rep(input: proc_macro::TokenStream) -> proc_macro::TokenStre
                                                         self.#field_name >= #val
                                                     }
                                                 });
+                                                asserts.push(quote! {
+                                                    assert!(self.#field_name >= #val, "failed invariant that self.{} must be >= {}, not {}", #field_name_name, #val, self.#field_name);
+                                                })
                                             } else if v.path.is_ident("assert_le") {
                                                 let val = v.lit.clone();
                                                 checks.push(quote! {
@@ -125,6 +152,9 @@ pub fn derive_check_rep(input: proc_macro::TokenStream) -> proc_macro::TokenStre
                                                         self.#field_name <= #val
                                                     }
                                                 });
+                                                asserts.push(quote! {
+                                                    assert!(self.#field_name <= #val, "failed invariant that self.{} must be <= {}, not {}", #field_name_name, #val, self.#field_name);
+                                                })
                                             } else {
                                                 errors.push(Error::new(v.span(), "unsupported representation invariant").to_compile_error());
                                             }
@@ -152,17 +182,23 @@ pub fn derive_check_rep(input: proc_macro::TokenStream) -> proc_macro::TokenStre
     let expanded = if errors.len() > 0 {
         quote! {
             impl rep::CheckRep for #name {
-                fn check_rep(&self) -> bool {
+                fn is_correct(&self) -> bool {
                     true
                 }
+
+                fn check_rep(&self) {}
             }
             #(#errors)*
         }
     } else {
         quote! {
             impl rep::CheckRep for #name {
-                fn check_rep(&self) -> bool {
+                fn is_correct(&self) -> bool {
                     true #(#checks)*
+                }
+
+                fn check_rep(&self) {
+                    #(#asserts)*
                 }
             }
         }
@@ -202,10 +238,10 @@ pub fn check_rep(_attr: proc_macro::TokenStream, item: proc_macro::TokenStream) 
                     }) {
                         // insert calls to check rep at start and end of method
                         impl_item_method.block.stmts.insert(0, syn::parse::<Stmt>(quote! {
-                            assert!(self.check_rep());
+                            self.check_rep();
                         }.into()).unwrap());
                         impl_item_method.block.stmts.push(syn::parse::<Stmt>(quote! {
-                            assert!(self.check_rep());
+                            self.check_rep();
                         }.into()).unwrap());
 
                         new_impl_item_method.block.stmts = impl_item_method.block.stmts;
