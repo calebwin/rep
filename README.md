@@ -79,4 +79,7 @@ Just add the following to your `Cargo.toml` file.
 rep = "0.2.0"
 ```
 
-Then you can begin defining representations and improving the safety of your software.
+Then, in your module.
+```rust
+use rep::*
+```
