@@ -1,6 +1,6 @@
 [package]
 name = "rep"
-version = "0.1.0"
+version = "0.3.0"
 authors = ["Caleb Winston <calebhwin@gmail.com>"]
 description = "A small tool for representation/class invariants"
 homepage = "https://www.github.com/calebwin/rep"
@@ -13,6 +13,6 @@ license = "MIT"
 edition = "2018"
 
 [dependencies]
-rep_derive = "0.2.0"
+rep_derive = "0.3.0"
 # rep_derive = { path = "../rep_derive" }
 log = "0.4.8"
