@@ -157,10 +157,10 @@ If a logger is present invariant violation will be logged instead of panicked.
 Just add the following to your `Cargo.toml` file.
 ```toml
 [dependencies]
-rep = "0.2.0"
+rep = "0.3.0"
 ```
 
 Then, in your module.
 ```rust
-use rep::*
+use rep::*;
 ```
