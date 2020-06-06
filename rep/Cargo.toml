@@ -13,4 +13,6 @@ license = "MIT"
 edition = "2018"
 
 [dependencies]
-rep_derive = "0.1.0"
+rep_derive = "0.2.0"
+# rep_derive = { path = "../rep_derive" }
+log = "0.4.8"
