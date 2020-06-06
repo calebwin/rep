@@ -2,11 +2,16 @@
 [![](http://meritbadge.herokuapp.com/rep)](https://crates.io/crates/rep)
 [![](https://docs.rs/rep/badge.svg)](https://docs.rs/rep)
 
-Rep lets you easily check representation/class invariants in your Rust data structures.
+`rep` is a tiny utility that lets you easily enforce [representation/class invariants](https://en.wikipedia.org/wiki/Class_invariant) throughout your Rust data structures.
 
-As programmers, we should care about correctness at compile time and at run time. We should care about our data structures being correct. Rep is a small tool that lets you do 2 things.
-1. Define a correct representation (a rep/class invariant)
-2. Insert runtime checks (rep checks)
+Representation invariants are logical assertions that must hold true for every mutation of your data structure. For example, in your GIS application, you may have the following rep invariant for a `LatLong`.
+```rust
+self.lat >= -90.0 && self.lat <= 90 && self.long >= -180.0 && self.long <= 180
+```
+
+Enforcing representation invariants is easy with `rep`. Adding invariants to your data structures is just 2 easy steps.
+1. Define a correct representation (by implementing `CheckRep` either manually or with a macro)
+2. Insert runtime checks (either manually or with a macro)
 
 # some examples
 
