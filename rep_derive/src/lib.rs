@@ -317,10 +317,12 @@ pub fn check_rep(_attr: proc_macro::TokenStream, item: proc_macro::TokenStream) 
     			let mut new_impl_item_method = impl_item_method.clone();
 
                 if let Visibility::Public(_) = new_impl_item_method.vis {
-                    if new_impl_item_method.sig.inputs.iter().fold(false, |_, input| if let FnArg::Receiver(receiver) = input {
-                        receiver.mutability.is_some()
-                    } else {
-                        false
+                    if new_impl_item_method.sig.inputs.iter().any(|input| {
+                        if let FnArg::Receiver(receiver) = input {
+                            receiver.mutability.is_some()
+                        } else {
+                            false
+                        }
                     }) {
                         // insert calls to check rep at start and end of method
                         impl_item_method.block.stmts.insert(0, syn::parse::<Stmt>(quote! {
