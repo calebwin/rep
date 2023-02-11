@@ -297,7 +297,7 @@ pub fn derive_check_rep(input: proc_macro::TokenStream) -> proc_macro::TokenStre
 /// A macro that auto-inserts calls to `check_rep`
 ///
 /// This macro can be applied to an `impl` block to inserts calls to `check_rep` only in methods that satisfy the following.
-/// - Visiblity is `pub`
+/// - Visibility is `pub`
 /// - Parameters include `&mut self`
 ///
 /// You may also apply it to a method in an `impl` block regardless of the method's signature.
