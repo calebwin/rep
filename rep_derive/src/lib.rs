@@ -297,7 +297,7 @@ pub fn derive_check_rep(input: proc_macro::TokenStream) -> proc_macro::TokenStre
 /// A macro that auto-inserts calls to `check_rep`
 ///
 /// This macro can be applied to an `impl` block to inserts calls to `check_rep` only in methods that satisfy the following.
-/// - Visiblity is `pub`
+/// - Visibility is `pub`
 /// - Parameters include `&mut self`
 ///
 /// You may also apply it to a method in an `impl` block regardless of the method's signature.
@@ -317,10 +317,12 @@ pub fn check_rep(_attr: proc_macro::TokenStream, item: proc_macro::TokenStream) 
     			let mut new_impl_item_method = impl_item_method.clone();
 
                 if let Visibility::Public(_) = new_impl_item_method.vis {
-                    if new_impl_item_method.sig.inputs.iter().fold(false, |_, input| if let FnArg::Receiver(receiver) = input {
-                        receiver.mutability.is_some()
-                    } else {
-                        false
+                    if new_impl_item_method.sig.inputs.iter().any(|input| {
+                        if let FnArg::Receiver(receiver) = input {
+                            receiver.mutability.is_some()
+                        } else {
+                            false
+                        }
                     }) {
                         // insert calls to check rep at start and end of method
                         impl_item_method.block.stmts.insert(0, syn::parse::<Stmt>(quote! {
